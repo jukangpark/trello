@@ -4,9 +4,18 @@ interface IToDoState {
   [key: string]: string[];
 }
 
-export const toDoState = atom<IToDoState>({
+/* export const toDoState = atom<IToDoState>({
   key: "toDo",
   default: { to_do: ["a", "b"], doing: ["c", "d", "e"], done: ["f"] },
+}); */
+
+export const toDoState = atom<IToDoState>({
+  key: "toDo",
+  default: {
+    "To Do": ["a", "b"],
+    Doing: ["c", "d", "e"],
+    Done: ["f"],
+  },
 });
 
 /* import { atom, selector } from "recoil";
