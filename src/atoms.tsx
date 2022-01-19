@@ -1,7 +1,12 @@
 import { atom } from "recoil";
 
+export interface IToDo {
+  id: number;
+  text: string;
+}
+
 interface IToDoState {
-  [key: string]: string[];
+  [key: string]: IToDo[];
 }
 
 /* export const toDoState = atom<IToDoState>({
@@ -12,11 +17,12 @@ interface IToDoState {
 export const toDoState = atom<IToDoState>({
   key: "toDo",
   default: {
-    "To Do": ["a", "b"],
-    Doing: ["c", "d", "e"],
-    Done: ["f"],
+    "To Do": [],
+    Doing: [],
+    Done: [],
   },
 });
+// 기본 값은 객체, 객체안의 배열, 배열 안의 객체 <IToDo>
 
 /* import { atom, selector } from "recoil";
 

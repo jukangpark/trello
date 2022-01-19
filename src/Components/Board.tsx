@@ -1,6 +1,9 @@
 import { useRef } from "react";
 import { Droppable } from "react-beautiful-dnd";
+import { useForm } from "react-hook-form";
+import { useSetRecoilState } from "recoil";
 import styled from "styled-components";
+import { IToDo, toDoState } from "../atoms";
 import DraggableCard from "./DragabbleCard";
 
 const Wrapper = styled.div`
@@ -18,6 +21,17 @@ interface IAreaProps {
   isDraggingOver: boolean;
   isDraggingFromThis: boolean;
 }
+
+interface IForm {
+  toDo: string;
+}
+
+const Form = styled.form`
+  width: 100%;
+  input {
+    width: 100%;
+  }
+`;
 
 const Area = styled.div<IAreaProps>`
   background-color: ${(props) =>
@@ -39,24 +53,43 @@ const Title = styled.h2`
 `;
 
 interface IBoardProps {
-  toDos: string[];
+  // toDos: string[];
+  toDos: IToDo[];
   boardId: string;
 }
 
 function Board({ toDos, boardId }: IBoardProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const onClick = () => {
-    inputRef.current?.focus();
-    setTimeout(() => {
-      inputRef.current?.blur();
-    }, 5000);
+  const setToDos = useSetRecoilState(toDoState);
+  const { register, setValue, handleSubmit } = useForm<IForm>();
+  const onValid = ({ toDo }: IForm) => {
+    const newToDo = {
+      id: Date.now(),
+      text: toDo,
+    };
+    // console.log(data);
+
+    setToDos((allBoards) => {
+      console.log(allBoards);
+      return {
+        ...allBoards,
+        [boardId]: [newToDo, ...allBoards[boardId]],
+        // 원래 있던 board들과 현재 우리가 있는
+        // board들을 return 하고 기존의 board content들에 우리의 newToDo를 더해주고 있어.
+      };
+    });
+    setValue("toDo", "");
   };
 
   return (
     <Wrapper>
       <Title>{boardId}</Title>
-      <input ref={inputRef} placeholder="grab me" />
-      <button onClick={onClick}>click me</button>
+      <Form onSubmit={handleSubmit(onValid)}>
+        <input
+          {...register("toDo", { required: true })}
+          type="text"
+          placeholder={`Add task on ${boardId}`}
+        />
+      </Form>
       <Droppable droppableId={boardId}>
         {(magic, info) => (
           <Area
@@ -66,7 +99,12 @@ function Board({ toDos, boardId }: IBoardProps) {
             {...magic.droppableProps}
           >
             {toDos.map((toDo, index) => (
-              <DraggableCard key={toDo} index={index} toDo={toDo} />
+              <DraggableCard
+                key={toDo.id}
+                index={index}
+                toDoId={toDo.id}
+                toDoText={toDo.text}
+              />
             ))}
             {magic.placeholder}
           </Area>
